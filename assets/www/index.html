@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>jQuery Mobile: Demos and Documentation</title>
+	<script type="text/javascript" charset="utf-8" src="js/phonegap-1.0.0.js"></script>
+	<link rel="stylesheet"  href="css/jquery.mobile-1.1.1.min.css" />
+
+	<script src="js/jquery.js"></script>
+	<script src="js/jquery.mobile-1.1.1.min.js"></script>
+	<script src="js/iscroll-lite.js"></script>
+	<script src="js/jquery.mobile.iscroll.js"></script>
+
+</head>
+<body>
+<div data-role="page" id="page1" data-iscroll="enable"  >
+	<div data-role="header" data-theme="b"  data-position="fixed">
+		<h1>Page Performance Monitor</h1>
+		<a href="###" onclick="back11();" data-icon="arrow-l"  data-iconpos="left" data-theme="d" id="bb1">后退</a>
+	</div>
+    <div data-role="content"  data-iscroll="scroller" id="scroller">
+		   <div action="demo.html" method="post" id="ff1" style="float:left;">
+			<fieldset data-role="controlgroup" data-type="vertical">
+                    <legend>
+                        周期:
+                    </legend>
+					  <select name="selectmenu24" id="selectmenu24">
+						  <option>
+							30日均线
+						  </option>
+						  <option>
+							7日均线
+						  </option>
+						  <option>
+							自定义 
+						  </option>
+					  </select>
+             </fieldset>
+            <div data-role="fieldcontain">
+                <fieldset data-role="controlgroup">
+                    <label for="searchinput1">
+                        页面名称:
+                    </label>
+                    <input name="" id="searchinput1" placeholder="页面名称/PageId" value="全站首页 100101" type="search">
+                </fieldset>
+            </div>
+			 <fieldset data-role="controlgroup" data-type="vertical">
+                    <legend>
+                        指标:
+                    </legend>
+					  <select name="selectmenu2" id="selectmenu2">
+					  <option >
+					   Time总时长
+					  </option>
+					  <option >
+					   DNS域名解析
+					  </option>
+					  <option >
+					   Connec建立连接
+					  </option>
+					  <option>
+					   Request发送请求
+					  </option>
+					  <option >
+					   Response等待响应
+					  </option>
+					  <option>
+					   Dom Ready页面准备完毕
+					  </option>
+					 
+					  </select>
+                </fieldset>
+            <div data-role="fieldcontain">
+                <label for="selectmenu3">
+                    区域:
+                </label>
+                <select name="selectmenu3" id="selectmenu3">
+                    <option>
+                        全国
+                    </option>
+                    <option>
+                        华东
+                    </option>
+                    <option>
+                        华北
+                    </option>
+                    <option>
+                        华南
+                    </option>
+                    <option>
+                        华中
+                    </option>
+                </select>
+            </div>
+            <div data-role="fieldcontain">
+                <fieldset data-role="controlgroup" data-type="vertical">
+                    <legend>
+                        运营商:
+                    </legend>
+					<label>
+						<input name="checkbox1" id="checkbox1" type="checkbox" checked>
+                    
+                        电信
+                    </label>
+					 <label>
+                    <input name="checkbox2" id="checkbox2" type="checkbox" checked>
+                   
+                        联通
+                    </label>
+					 <label>
+                    <input name="checkbox3" id="checkbox3" type="checkbox">
+                   
+                        移动
+                    </label>
+					<label>
+                    <input name="checkbox4" id="checkbox4" type="checkbox">
+                    
+                        其它
+                    </label>
+                </fieldset>
+            </div>
+            <input type="button" onclick="abc()" data-theme="b" value="查看">
+			<br/>
+        </div>
+			<div id="one" style="float:left;margin-left:10px;">
+
+			<img src="images/demo.png"  style="width:100%;height:100%" />
+				
+			</div>
+   </div>
+	<div data-role="footer" data-theme="b"  data-position="fixed"> 
+		<h4>powered by Big Footprints </h4> 
+	</div> 
+</div>
+<style>
+	#page1 *{
+		-webkit-backface-visibility: hidden;
+	}
+</style>
+<script type="text/javascript">
+	$(function(){
+		setTimeout(function(){
+			$('#scroller')[0].style.webkitTransition="all 0.2s ease";
+		},200);
+		$('#ff1').css("width",$(window).width()-25+'px');
+		$('#one').css("width",$(window).width()+'px');
+		$('#scroller').css("width",$(window).width()*2+25+'px');
+		$('#bb1').hide();
+	});
+	function back11(){
+		$('#scroller')[0].style.marginLeft =  "0px";
+		$('#bb1').hide();
+	}
+	function abc(){
+		
+		$('#scroller')[0].style.marginLeft = "-"+$(window).width()+ "px";
+		$('#bb1').show();
+	}
+</script>
+</body>
+</html>
