@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>jQuery Mobile: Demos and Documentation</title>
+	<title>ppm</title>
 	<script type="text/javascript" charset="utf-8" src="js/phonegap-1.0.0.js"></script>
 	<link rel="stylesheet"  href="css/jquery.mobile-1.1.1.min.css" />
 
@@ -11,7 +11,14 @@
 	<script src="js/jquery.mobile-1.1.1.min.js"></script>
 	<script src="js/iscroll-lite.js"></script>
 	<script src="js/jquery.mobile.iscroll.js"></script>
-
+	<script src="js/ppm.js"></script>
+	<style type="text/css">
+		#searchinput1{
+				-webkit-transition:all 12s ease;
+				left:0;
+				top:0
+		}
+	</style>
 </head>
 <body>
 <div data-role="page" id="page1" data-iscroll="enable"  >
@@ -26,13 +33,13 @@
                         周期:
                     </legend>
 					  <select name="selectmenu24" id="selectmenu24">
-						  <option>
+						  <option value="1">
 							30日均线
 						  </option>
-						  <option>
+						  <option value="2">
 							7日均线
 						  </option>
-						  <option>
+						  <option value="3">
 							自定义 
 						  </option>
 					  </select>
@@ -120,14 +127,18 @@
                     </label>
                 </fieldset>
             </div>
+			<div id="calendars" class="calendar_wrap" style="width:100%; position: absolute;top:0;left:0">
+				<div id="calendar0" hidefocus="true" class="calendar_month"></div>
+		
+			</div>
             <input type="button" onclick="abc()" data-theme="b" value="查看">
 			<br/>
         </div>
-			<div id="one" style="float:left;margin-left:10px;">
+		<div id="one" style="float:left;margin-left:10px;">
 
 			<img src="images/demo.png"  style="width:100%;height:100%" />
-				
-			</div>
+			
+		</div>
    </div>
 	<div data-role="footer" data-theme="b"  data-position="fixed"> 
 		<h4>powered by Big Footprints </h4> 
@@ -138,6 +149,8 @@
 		-webkit-backface-visibility: hidden;
 	}
 </style>
+<script src="js/jPageSelector.js"></script>
+<script src="js/jCalenda.js"></script>
 <script type="text/javascript">
 	$(function(){
 		setTimeout(function(){
@@ -147,6 +160,48 @@
 		$('#one').css("width",$(window).width()+'px');
 		$('#scroller').css("width",$(window).width()*2+25+'px');
 		$('#bb1').hide();
+		
+		$('#searchinput1').PageSelector({
+			configs: configs,
+			onChange: function(data) {
+
+				
+			}
+		});
+		var stylesCalendar = "#calendar1 .calendar_title a {display:none;}.calendar_wrap{background:#fff;overflow:hidden;font-size:14px;box-shadow:0 10px 20px skyBlue; border-radius:5px 5px 0 0;}.calendar_wrap a{color:#0053aa;text-decoration:none;}#calendar0{width: 100%;}#calendar1{width: 100%;}#calendar2{width: 100%;}.calendar_month{float: left;text-align: center;}.calendar_title{height:32px;line-height:32px;font-weight: bold;color:#fff;background:#5E87B0;text-align:center;border-radius:5px 5px 0 0;}.month_prev,.month_next{width:32px;height:32px;color:#fff;background:url(un_hotel.png) no-repeat;cursor:pointer;}.month_prev{float:left;background-position:-72px -458px;}.month_next{float:right;background-position:-104px -458px;}.calendar_day{ width:100% }.calendar_month th {line-height:30px;background:#f0f0f0;border-bottom:1px solid #ccc;color: #666; text-align:center;}.calendar_month .weekend{font-weight:bold;color:#f90;}.calendar_day td a {display:block; line-height:50px;font-weight:bold; background:#fff;color:#666;text-shadow:0 0 2px #999;}.calendar_day a:hover{background:#c9ddef;border-color:#6bd0f0; text-decoration:none;}.calendar_day .day_over,.calendar_day .day_no{font-weight:normal;color:#dbdbdb;outline:none;text-shadow:0 0 0 #fff;}.calendar_day .day_over:hover,.calendar_day .day_no:hover{background:#fff;border-color:#fff;}.calendar_day .day_selected,.calendar_day .day_selected:hover{background:#6eafbf;border-color:#548493;color:#fff;}.calendar_day .today{background-color:#ffe487;border-color:#f6a018;color:#a33d00;}.c_calender_date{display:inline-block;color:#666;text-align:right;position:absolute;z-index:1;}";
+		 $("#selectmenu24").CalendarManage({
+                 options: {
+                     showWeek: false,
+                     nextEl: "#t3",
+                     todayClass: "rrrrrrrrrrrr",
+                     styles: stylesCalendar,
+                        today:"2012-09-18",
+                     step: 1,
+                     items: [{
+                         target: "calendar0",
+						 id:"#calendar0",
+                         type: '',
+                         autoRender: false,
+                         showPrev: false,
+                         showNext: false
+                     }],
+                     closeDate: {
+                         '2012-12-18': "说明一下为什么不可用",
+                         '2012-10-20': "你好世界",
+                         '2012-09-29': "你好世界"
+                     }
+                 },
+                 listeners: {
+                     onShow: function () {
+                        
+                     },
+                     onChange: function (input, value, isClick) {
+						
+							$('#selectmenu24').prev().find('span').eq(0).html(value);
+						
+                     }
+                 }
+             });
 	});
 	function back11(){
 		$('#scroller')[0].style.marginLeft =  "0px";
@@ -158,5 +213,6 @@
 		$('#bb1').show();
 	}
 </script>
+
 </body>
 </html>
