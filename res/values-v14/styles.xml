@@ -1,5 +1,10 @@
 <resources>
-
-    <style name="AppTheme" parent="android:Theme.Holo.Light.DarkActionBar" />
-
+    <style parent="@android:style/Theme" name="AppTheme">
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowFrame">@drawable/bg3</item>
+        <item name="android:windowBackground">@drawable/bg3</item>
+	</style>
+	 <style parent="@android:style/Theme" name="abc">
+        <item name="android:windowNoTitle">true</item>
+	</style>
 </resources>

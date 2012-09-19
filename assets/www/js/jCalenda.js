@@ -278,30 +278,122 @@
 		getOptByType: function(type) {
 			return this.typeList[type];
 		},
-		bindAddNumEvent: function() {
-			$(this.target).bind(START_EV, function(e) {
-				var tag = e.target;
-				var hasClass = false;
-				for (var b in this.typeList) {
-					if ($(tag).hasClass(b)) {
-						hasClass = true;
-						break;
-					}
-				};
-				if (tag.tagName == this.monthTagName.toUpperCase() && hasClass) {
+		bindAddNumEvent: function() {		
+			if(!document.getElementById(this.target[0].id).hasBind){
+			document.getElementById(this.target[0].id).addEventListener(END_EV,function(e){
+				if(!window.CalendarManage.hasMove){
+					window.CalendarManage.beginM = 0;
+					window.CalendarManage.beginX = 0;
+					window.CalendarManage.dragEl = null;
+					 window.CalendarManage.hasMove = false;
+					var tag = e.target;
+					var hasClass = false;
+					for (var b in this.typeList) {
+						if ($(tag).hasClass(b)) {
+							hasClass = true;
+							break;
+						}
+					};
+					if (tag.tagName == this.monthTagName.toUpperCase() && hasClass) {
 
-					this.changeMonth(this, this.getOptByType(tag.className));
-					return false;
-				};
-				tag = (tag.tagName == this.dayTagName.toUpperCase() ? tag : $(tag).parents(this.dayTagName)[0]);
-				if (tag) {
-					if (tag.tagName == this.dayTagName.toUpperCase()) {
-						this.clickEvent(this, tag);
-						return false
+						this.changeMonth(this, this.getOptByType(tag.className));
+						return false;
+					};
+					tag = (tag.tagName == this.dayTagName.toUpperCase() ? tag : $(tag).parents(this.dayTagName)[0]);
+					if (tag) {
+					
+						if (tag.tagName == this.dayTagName.toUpperCase()) {
+							this.clickEvent(this, tag);
+							return false
+						}
 					}
+					
+					
+					
+					return ;
 				}
-				return false
-			}.bind(this));
+				var pageX = (e.changedTouches && e.changedTouches[0])?e.changedTouches[0].pageX:e.pageX;
+				var pageY = (e.changedTouches && e.changedTouches[0])?e.changedTouches[0].pageY:e.pageY;
+				console.log(pageX);
+				var opt =  ( window.CalendarManage.beginX-pageX);
+				var divs = $("#calendars>div");
+				var index =divs.index(window.CalendarManage.dragEl);
+				var left =0;
+				if(opt>0){
+					 left = index? -($(window).width())*(index+1):-($(window).width());
+					 
+				}else{
+					 left = index? -($(window).width())*(index-1):-($(window).width());
+				}
+				if(opt<0 && index==0){
+					left = 0;
+				}
+				if( opt>0 && index == divs.length-1 ){
+					left = -($(window).width()*index-1);
+				}
+			
+				left = Math.round(left/10,2)*10;			
+				//	console.log([opt,left].join('-----'));
+				 $("#calendars").animate({ "margin-left": left }, { duration: 150 ,complete :function(){
+					window.CalendarManage.beginM = 0;
+					window.CalendarManage.beginX = 0;
+					window.CalendarManage.dragEl = null;
+					 window.CalendarManage.hasMove = false;
+				 }});						
+			}.bind(this),false);
+			
+			document.getElementById(this.target[0].id).addEventListener(MOVE_EV,function(e){
+					var pageX = (e.touches && e.touches[0])?e.touches[0].pageX:e.pageX;
+					var pageY = (e.touches && e.touches[0])?e.touches[0].pageY:e.pageY;
+					
+					var beginM = window.CalendarManage.beginM;
+					var beginX = window.CalendarManage.beginX ;
+				//	$('.ui-title').html([pageX,beginM,beginX].join('---'));
+					if(window.CalendarManage.dragEl){
+						 if(Math.abs(pageX-window.CalendarManage.beginX)>10  ){
+							window.CalendarManage.hasMove = true; 
+							document.getElementById('calendars').style.marginLeft = beginM+ pageX - (beginX) + 'px';
+						}
+					}
+			},false);
+			document.getElementById(this.target[0].id).hasBind = true;
+			}
+			/*document.getElementById(this.target[0].id).addEventListener('click',function(e){
+					var tag = e.target;
+					var hasClass = false;
+					for (var b in this.typeList) {
+						if ($(tag).hasClass(b)) {
+							hasClass = true;
+							break;
+						}
+					};
+					if (tag.tagName == this.monthTagName.toUpperCase() && hasClass) {
+
+						this.changeMonth(this, this.getOptByType(tag.className));
+						return false;
+					};
+					tag = (tag.tagName == this.dayTagName.toUpperCase() ? tag : $(tag).parents(this.dayTagName)[0]);
+					if (tag) {
+					
+						if (tag.tagName == this.dayTagName.toUpperCase()) {
+							this.clickEvent(this, tag);
+							return false
+						}
+					}
+					return false
+			
+			}.bind(this),false);*/
+			document.getElementById(this.target[0].id).addEventListener(START_EV, function(e) {
+			
+				var pageX = (e.touches && e.touches[0])?e.touches[0].pageX:e.pageX;
+				var pageY = (e.touches && e.touches[0])?e.touches[0].pageY:e.pageY;
+	
+				window.CalendarManage.beginX = (pageX||0);
+				window.CalendarManage.dragEl = this.target;
+				window.CalendarManage.beginM =  (parseInt(document.getElementById("calendars").style.marginLeft)||0);
+				var tag = e.target;
+				
+			}.bind(this),false);
 		},
 		/**
 		 *点击事件响应函数
@@ -366,27 +458,27 @@
 		 *绑定移动事件
 		 */
 		bindMoveEvent: function() {
-			var startDate = null;
-			var endDate = null;
-			var datStartDate = null;
-			var dateEndDate = null;
-			var self = this;
-			this.target.bind("mouseover", function(e) {
-				if (self.input) {
-					startDate = $(self.input).data('startDate') || self.startDate;
-					endDate = $(self.input).data('endDate') || self.endDate;
-				}
+			// var startDate = null;
+			// var endDate = null;
+			// var datStartDate = null;
+			// var dateEndDate = null;
+			// var self = this;
+			// this.target.bind("mouseover", function(e) {
+				// if (self.input) {
+					// startDate = $(self.input).data('startDate') || self.startDate;
+					// endDate = $(self.input).data('endDate') || self.endDate;
+				// }
 
-				self.chkHoverColor(startDate, endDate, e.target);
-			}.bind(this));
-			this.target.bind(END_EV, function(e) {
-				var toElement = e.relatedTarget || e.toElement;
-				if (toElement && self.input && !contains(self.target[0].parentNode, toElement) && startDate && endDate) {
-					datStartDate = this.strToDate(startDate);
-					dateEndDate = this.strToDate(endDate);
-					self.clearHoverColor(datStartDate, dateEndDate);
-				}
-			}.bind(this));
+				// self.chkHoverColor(startDate, endDate, e.target);
+			// }.bind(this));
+			// this.target.bind(END_EV, function(e) {
+				// var toElement = e.relatedTarget || e.toElement;
+				// if (toElement && self.input && !contains(self.target[0].parentNode, toElement) && startDate && endDate) {
+					// datStartDate = this.strToDate(startDate);
+					// dateEndDate = this.strToDate(endDate);
+					// self.clearHoverColor(datStartDate, dateEndDate);
+				// }
+			// }.bind(this));
 		},
 		/**
 		 *日期对象转为日期字符串用于日期Id
@@ -570,7 +662,8 @@
 				date.getFullYear(), date.getMonth(), (i - beginDay));
 				var tempDateStr = this.getDateString(tempDate);
 				var tempId = tempDateStr + "_" + this.target[0].id;
-				var tempClass = this.getClass(tempDate, tempDateStr, input);
+				//var tempClass = this.getClass(tempDate, tempDateStr, input);
+				var tempClass="";
 				var tempFestival = tempDate <= new Date() ? "" : (this.festival[tempDateStr] || "");
 				tempFestival = tempFestival ? tempFestival[0] : "";
 				var strDay = this.setToday(tempDate);
@@ -704,7 +797,8 @@
 						wrap: '<div class="calendar_wrap" id="calendars" style="position:absolute;display:none;" >{$calendars}</div>',
 						calendar: '<div id="{$calendarid}" hidefocus="true" class="calendar_month"></div>'
 					},
-					styles: ".calendar_wrap{width:363px;background: #fff; padding: 5px 5px 0;border: solid 1px #999;overflow: hidden;font-size:12px;font-family:tahoma,Arial,Helvetica,simsun,sans-serif;-moz-box-shadow:0 3px 5px #ccc;-webkit-box-shadow:0 3px 5px #ccc;box-shadow:0 3px 5px #ccc;}.calendar_wrap a{ color: #0053aa; text-decoration: none !important; }.calendar_wrap a:hover{text-decoration: underline;}#calendar0{width: 180px;}#calendar1{width: 182px;}.calendar_month{float: left;padding-bottom:5px;text-align: center;}.calendar_title{ height: 23px; line-height: 23px; font-weight: bold; color: #fff; background-color: #004fb8; text-align: center; }.month_prev,.month_next{ width: 23px; height: 23px; color: #fff; background: #2d7ce7 url(http://pic.c-ctrip.com/cquery/un_calender_index.png) no-repeat; cursor: pointer; }.month_prev{float: left;background-position: 0 0;}.month_next{float: right;background-position: 100% 0;}.month_prev:hover{background-color: #62adf1; background-position: 0 -26px;}.month_next:hover{background-color: #62adf1; background-position: 100% -26px;}.calendar_day{ overflow:hidden; margin: 0; padding-top:5px; }.calendar_day dd { margin: 0; padding: 0; }#calendar1 dl{border-left: 2px solid #aaa;padding-left: 5px;padding-bottom:30px;margin-bottom: -30px;}.calendar_month dt{ float: left; width: 25px; height: 22px; line-height: 20px; color: #666; background-color: #ececec; margin-bottom: 2px; }.calendar_month .weekend{font-weight: bold;color: #f90;}.calendar_day a{ float: left; width: 24px; height: 24px; line-height: 24px; margin-bottom: 1px; padding-right: 1px; font-size: 11px; font-weight: bold; color: #005ead; background-color: #fff; cursor: pointer; }.calendar_day a:hover,.calendar_day .today,.calendar_day .day_selected,.calendar_day .c_festival_select,.calendar_day .c_festival_select:hover{background: #e6f4ff url(http://pic.c-ctrip.com/cquery/un_calender_index.png) no-repeat;}.calendar_day a:hover{background-color: #e6f4ff;background-position: -26px -53px;text-decoration: none;}.calendar_day .today{background-color: #fff5d1;background-position: 0 -82px;}.calendar_day .day_over,.calendar_day .day_no{font-weight: normal;color: #dbdbdb;outline: none;cursor: default;}.calendar_day .day_over:hover,.calendar_day .day_no:hover{background: #fff;}.calendar_day .day_selected,.calendar_day .day_selected:hover{background-color: #629be0;background-position: 0 -53px;color: #fff;}.calendar_day .c_festival_select,.calendar_day .c_festival_select:hover{ background-color: #ffe6a6; background-image: url(http://pic.c-ctrip.com/cquery/un_calender_index.png); background-position: 0 -111px; }.c_yuandan span,.c_chuxi span,.c_chunjie span,.c_yuanxiao span,.c_qingming span,.c_wuyi span,.c_duanwu span,.c_zhongqiu span,.c_guoqing span,.c_jintian span{ width: 24px; height: 24px; background-image: url(http://pic.c-ctrip.com/cquery/un_festivals.png); background-repeat: no-repeat; text-indent: -9999em; overflow: hidden; display: block; }.c_yuandan span{background-position: 0 0;}.c_chuxi span{background-position: 0 -32px;}.c_chunjie span{background-position: 0 -64px;}.c_yuanxiao span{background-position: 0 -96px;}.c_qingming span{background-position: 0 -128px;}.c_wuyi span{background-position: 0 -160px;}.c_duanwu span{background-position: 0 -192px;}.c_zhongqiu span{background-position: 0 -224px;}.c_guoqing span{background-position: 0 -256px;}.c_jintian span{ background-position: 0 -288px;}.c_calender_date{ display: inline-block; color: #666; text-align: right; position: absolute; z-index: 1; }",
+					styles:"#calendar1 .calendar_title a {display:none;}.calendar_wrap{background:#fff;overflow:hidden;font-size:14px;box-shadow:0 10px 20px skyBlue; border-radius:5px 5px 0 0;}.calendar_wrap a{color:#0053aa;text-decoration:none;}#calendar0{width: 100%;}#calendar1{width: 100%;}#calendar2{width: 100%;}.calendar_month{float: left;text-align: center;}.calendar_title{height:32px;line-height:32px;font-weight: bold;color:#fff;background:#5E87B0;text-align:center;border-radius:5px 5px 0 0;}.month_prev,.month_next{width:32px;height:32px;color:#fff;background:url(un_hotel.png) no-repeat;cursor:pointer;}.month_prev{float:left;background-position:-72px -458px;}.month_next{float:right;background-position:-104px -458px;}.calendar_day{ width:100% }.calendar_month th {line-height:30px;background:#f0f0f0;border-bottom:1px solid #ccc;color: #666; text-align:center;}.calendar_month .weekend{font-weight:bold;color:#f90;}.calendar_day td a {display:block; line-height:50px;font-weight:bold; background:#fff;color:#666;text-shadow:0 0 2px #999;}.calendar_day a:hover{background:#c9ddef;border-color:#6bd0f0; text-decoration:none;}.calendar_day .day_over,.calendar_day .day_no{font-weight:normal;color:#dbdbdb;outline:none;text-shadow:0 0 0 #fff;}.calendar_day .day_over:hover,.calendar_day .day_no:hover{background:#fff;border-color:#fff;}.calendar_day .day_selected,.calendar_day .day_selected:hover{background:#6eafbf;border-color:#548493;color:#fff;}.calendar_day .today{background-color:#ffe487;border-color:#f6a018;color:#a33d00;}.c_calender_date{display:inline-block;color:#666;text-align:right;position:absolute;z-index:1;}",
+					//styles: ".calendar_wrap{width:363px;background: #fff; padding: 5px 5px 0;border: solid 1px #999;overflow: hidden;font-size:12px;font-family:tahoma,Arial,Helvetica,simsun,sans-serif;-moz-box-shadow:0 3px 5px #ccc;-webkit-box-shadow:0 3px 5px #ccc;box-shadow:0 3px 5px #ccc;}.calendar_wrap a{ color: #0053aa; text-decoration: none !important; }.calendar_wrap a:hover{text-decoration: underline;}#calendar0{width: 180px;}#calendar1{width: 182px;}.calendar_month{float: left;padding-bottom:5px;text-align: center;}.calendar_title{ height: 23px; line-height: 23px; font-weight: bold; color: #fff; background-color: #004fb8; text-align: center; }.month_prev,.month_next{ width: 23px; height: 23px; color: #fff; background: #2d7ce7 url(http://pic.c-ctrip.com/cquery/un_calender_index.png) no-repeat; cursor: pointer; }.month_prev{float: left;background-position: 0 0;}.month_next{float: right;background-position: 100% 0;}.month_prev:hover{background-color: #62adf1; background-position: 0 -26px;}.month_next:hover{background-color: #62adf1; background-position: 100% -26px;}.calendar_day{ overflow:hidden; margin: 0; padding-top:5px; }.calendar_day dd { margin: 0; padding: 0; }#calendar1 dl{border-left: 2px solid #aaa;padding-left: 5px;padding-bottom:30px;margin-bottom: -30px;}.calendar_month dt{ float: left; width: 25px; height: 22px; line-height: 20px; color: #666; background-color: #ececec; margin-bottom: 2px; }.calendar_month .weekend{font-weight: bold;color: #f90;}.calendar_day a{ float: left; width: 24px; height: 24px; line-height: 24px; margin-bottom: 1px; padding-right: 1px; font-size: 11px; font-weight: bold; color: #005ead; background-color: #fff; cursor: pointer; }.calendar_day a:hover,.calendar_day .today,.calendar_day .day_selected,.calendar_day .c_festival_select,.calendar_day .c_festival_select:hover{background: #e6f4ff url(http://pic.c-ctrip.com/cquery/un_calender_index.png) no-repeat;}.calendar_day a:hover{background-color: #e6f4ff;background-position: -26px -53px;text-decoration: none;}.calendar_day .today{background-color: #fff5d1;background-position: 0 -82px;}.calendar_day .day_over,.calendar_day .day_no{font-weight: normal;color: #dbdbdb;outline: none;cursor: default;}.calendar_day .day_over:hover,.calendar_day .day_no:hover{background: #fff;}.calendar_day .day_selected,.calendar_day .day_selected:hover{background-color: #629be0;background-position: 0 -53px;color: #fff;}.calendar_day .c_festival_select,.calendar_day .c_festival_select:hover{ background-color: #ffe6a6; background-image: url(http://pic.c-ctrip.com/cquery/un_calender_index.png); background-position: 0 -111px; }.c_yuandan span,.c_chuxi span,.c_chunjie span,.c_yuanxiao span,.c_qingming span,.c_wuyi span,.c_duanwu span,.c_zhongqiu span,.c_guoqing span,.c_jintian span{ width: 24px; height: 24px; background-image: url(http://pic.c-ctrip.com/cquery/un_festivals.png); background-repeat: no-repeat; text-indent: -9999em; overflow: hidden; display: block; }.c_yuandan span{background-position: 0 0;}.c_chuxi span{background-position: 0 -32px;}.c_chunjie span{background-position: 0 -64px;}.c_yuanxiao span{background-position: 0 -96px;}.c_qingming span{background-position: 0 -128px;}.c_wuyi span{background-position: 0 -160px;}.c_duanwu span{background-position: 0 -192px;}.c_zhongqiu span{background-position: 0 -224px;}.c_guoqing span{background-position: 0 -256px;}.c_jintian span{ background-position: 0 -288px;}.c_calender_date{ display: inline-block; color: #666; text-align: right; position: absolute; z-index: 1; }",
 					weekText: ["pic_sun", "pic_mon", "pic_tue", "pic_wed", "pic_thu", "pic_fir", "pic_sat"],
 					todayText: ["pic_today", "pic_tomorrow", "pic_aftertomorrow"],
 					closeDate: {
@@ -804,7 +898,8 @@
 		 *@param {HTMLElement} el 日历HTML对象
 		 */
 		createEl: function(el) {
-			var tmpEl = this.calendarWin.document.getElementById('calendars')
+			var tmpEl = this.calendarWin.document.getElementById('calendars');
+			;
 			if (tmpEl) {
 				return $(tmpEl);
 			}
@@ -952,7 +1047,7 @@
 		 */
 		setPosition: function(input, calendar) {
 			var xy = $(input).offset();
-			
+			xy.left = 0;
 			xy.top = xy.top+$(input).outerHeight()+1;
 			if (this.calendarIframe) {
 				$(this.calendarIframe).offset(xy);
@@ -1219,20 +1314,20 @@
 			var inputWin = defaults.inputWin;
 			var calendarWin = defaults.calendarWin;
 
-			function doReleaseCapture() {
-				if (CalendarManage['instance'].ctObj && CalendarManage['instance'].ctObj.releaseCapture) {
-					CalendarManage['instance'].ctObj.releaseCapture();
-					CalendarManage['instance'].ctObj = null;
-				}
-			}
+			// function doReleaseCapture() {
+				// if (CalendarManage['instance'].ctObj && CalendarManage['instance'].ctObj.releaseCapture) {
+					// CalendarManage['instance'].ctObj.releaseCapture();
+					// CalendarManage['instance'].ctObj = null;
+				// }
+			// }
 
-			function doSetCapture(obj) {
-				if (obj.setCapture) {
-					doReleaseCapture();
-					obj.setCapture();
-					CalendarManage['instance'].ctObj = obj;
-				}
-			}
+			// function doSetCapture(obj) {
+				// if (obj.setCapture) {
+					// doReleaseCapture();
+					// obj.setCapture();
+					// CalendarManage['instance'].ctObj = obj;
+				// }
+			// }
 
 			if (!CalendarManage['instance']) {
 				CalendarManage['instance'] = new CalendarManage(defaults);
@@ -1240,20 +1335,19 @@
 			if (defaults.showWeek) {
 				CalendarManage['instance'].setWeek(objs);
 			}
-			$(objs).bind('focus', function() {
-			
-				//CalendarManage['instance'].show(this);
-				calendarWin.document.getElementById('calendars').onmousedown = function(e) {
+			// $(objs).bind('focus', function() {
+
+				// calendarWin.document.getElementById('calendars').onmousedown = function(e) {
 					
-					return false;
-				};
-			});
-			$(objs).bind(END_EV, function() {
+					// return false;
+				// };
+			// });
+			// $(objs).bind(END_EV, function() {
 				
-			});
-			$(objs).bind('change', function(e) {
-				CalendarManage['instance'].change(this);
-			});
+			// });
+			// $(objs).bind('change', function(e) {
+				// CalendarManage['instance'].change(this);
+			// });
 			// $(objs).bind('blur', function(e) {
 			
 				//CalendarManage['instance'].hide();
