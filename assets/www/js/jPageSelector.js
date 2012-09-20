@@ -45,7 +45,7 @@ var configs = {
 				listcontent: '<ul data="{$index}" class="page_droplist_item" style="display:{$display}">{$list}</ul>',
 				list:'<li data="{$pageid}  {$pagename}"><span class="page_name">{$pagename}</span><span class="page_value">{$pageid}</span></li>'
 			},
-			styles: "html,body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,pre,code,form,fieldset,legend,input,textarea,p,blockquote,th,td,em,button,article, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, section{margin:0; padding:0;}article, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, section{display: block;}table{border-collapse:collapse;border-spacing:0px;}fieldset,img,hr{border:0;}address,caption,cite,code,dfn,em,strong,th,var{font-style:normal; font-weight:normal;}ol,ul{list-style:none;}caption,th{text-align:left;}h1,h2,h3,h4,h5,h6{font-size:100%;font-weight:normal;}abbr,acronym{border:0;}/* Font */body{font:12px/1.5 Simsun, sans-serif;}select, input, button, textarea{font-size:12px;}table{font-size:inherit; font:100%;}h1, h2, h3, h4, h5 ,h6{font-family:Simsun, sans-serif;} /* Link */a{color:#333; text-decoration:none;} a:hover{text-decoration:underline;}/*下拉页面选择样式 page_drop*/.page_drop{position:absolute; width:350px; box-shadow: 2px 2px 5px rgb(51, 51, 51); border:1px solid #1e7d9d; background-color:#fff;}.page_drophot{height:24px; padding-left:10px; line-height:24px; background-color:#03b5de; color:#fff;}.page_droplist{padding:5px; overflow:hidden;}.page_droplist_tab{border-bottom: 1px solid #5DA9E2; height:24px;}.page_droplist_tab .tab_item{float: left; height: 24px; padding:0 10px; line-height: 24px; text-align: center; color: #005DAA; cursor: pointer;}.address_hot_abb li span{padding:0 8px;}.page_droplist_tab .tab_selected{position:relative; border-color:#5DA9E2 #5DA9E2 transparent; border-style:solid solid none; border-width: 1px 1px 0; background-color:#fff; color: #000000; font-weight: bold; background-color:#fff;}.page_droplist_item{padding-top:10px;}.page_droplist_item li{height: 24px; padding:0 10px; line-height:24px; overflow: hidden; cursor:pointer;}.page_droplist_item li:hover{background-color:#d3f3fe;}.page_droplist_item .page_name{float:left;}.page_droplist_item .page_value{float:right;}"
+			styles: "ul{margin:0; padding:0;}article, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, section{display: block;}table{border-collapse:collapse;border-spacing:0px;}fieldset,img,hr{border:0;}address,caption,cite,code,dfn,em,strong,th,var{font-style:normal; font-weight:normal;}ol,ul{list-style:none;}caption,th{text-align:left;}h1,h2,h3,h4,h5,h6{font-size:100%;font-weight:normal;}abbr,acronym{border:0;}/* Font */body{font:12px/1.5 Simsun, sans-serif;}select, input, button, textarea{font-size:12px;}table{font-size:inherit; font:100%;}h1, h2, h3, h4, h5 ,h6{font-family:Simsun, sans-serif;} /* Link */a{color:#333; text-decoration:none;} a:hover{text-decoration:underline;}/*下拉页面选择样式 page_drop*/.page_drop{position:absolute; border-radius: 5px 5px 0 0;width:350px; box-shadow: 2px 2px 5px rgb(51, 51, 51); border:1px solid #1e7d9d; background-color:#fff;}.page_drophot{height:24px; padding-left:10px; line-height:24px; background-color:#03b5de; color:#fff;}.page_droplist{padding:5px; overflow:hidden;}.page_droplist_tab{border-bottom: 1px solid #5DA9E2; height:24px;}.page_droplist_tab .tab_item{float: left; height: 24px; padding:0 10px; line-height: 24px; text-align: center; color: #005DAA; cursor: pointer;}.address_hot_abb li span{padding:0 8px;}.page_droplist_tab .tab_selected{position:relative; border-color:#5DA9E2 #5DA9E2 transparent; border-style:solid solid none; border-width: 1px 1px 0; background-color:#fff; color: #000000; font-weight: bold; background-color:#fff;}.page_droplist_item{padding-top:10px;}.page_droplist_item li{height: 24px; padding:0 10px; line-height:24px; overflow: hidden; cursor:pointer;}.page_droplist_item li:hover{background-color:#d3f3fe;}.page_droplist_item .page_name{float:left;}.page_droplist_item .page_value{float:right;}"
 		};
 
 		$.extend(defaults, opts);
@@ -63,6 +63,9 @@ var configs = {
 			this.target = $(this.target);
 		},
 		createStyle: function() {
+			if(!this.styles){
+				return;
+			}
 			if ($.browser.isIE) {
 				sty = this.window.document.createStyleSheet();
 				sty.cssText = this.styles
@@ -204,9 +207,10 @@ var configs = {
 			var xy = $(this.target.floatEl).offset();
 			var tagxy = $(this.target).offset();
 			if(tagxy.left+$(this.target.floatEl).width()>$(window).width()){
-				pos.left = tagxy.left + 'px';
-				//pos.left = 0;
+				//pos.left = tagxy.left + 'px';
+				pos.left = 0;
 			}
+			$(this.target.floatEl).css('width',$(window).width()-3+'px')
 			$(this.target.floatEl).offset(pos);
 		},
 		isFocus:false,

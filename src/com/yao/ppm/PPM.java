@@ -1,6 +1,6 @@
 package com.yao.ppm;
 import com.phonegap.*;
-import com.yao.ppm.*;
+
 
 
 import android.os.Bundle;
